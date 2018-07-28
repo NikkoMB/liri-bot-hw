@@ -15,6 +15,6 @@ var spotifyKeys = {
 // OMDB
 var omdbKey = '40e9cece';
 
-module.exports.twitterKeys = twitterKeys;
-module.exports.spotifyKeys = spotifyKeys;
+module.exports = twitterKeys;
+module.exports = spotifyKeys;
 module.exports.omdbKey = omdbKey;
