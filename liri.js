@@ -5,7 +5,7 @@ var request = require("request")
 var keys = require("./keys");
 
 var action = process.argv[2];
-var parameter = process.argv[3];
+var parameter = process.argv.slice(3).join(" ");
 // Labelling all my variables and important node stuff
 
 function switchCase() {
@@ -38,12 +38,7 @@ function switchCase() {
 function grabTweets() {
   console.log("Latest Tweets!");
   // New variable for Twitter to load keys from keys.js
-  var client = new Twitter({
-    consumer_key: keys.twitterKeys.consumer_key,
-    consumer_secret: keys.twitterKeys.consumer_secret,
-    access_token_key: keys.twitterKeys.access_token_key,
-    access_token_secret: keys.twitterKeys.access_token_secret
-  });
+  var client = new Twitter (keys.twitterKeys);
 
   var params = {
     screen_name: "RowinnDinosaur"
@@ -94,13 +89,10 @@ function grabMovie() {
 function grabSong() {
   console.log("Music!");
   // Spotify variable loading keys from keys.js
-  var spotify = new Spotify({
-    id: keys.spotifyKeys.client_ID,
-    secret: keys.spotifyKeys.client_secret
-  });
+  var spotify = new Spotify(keys.spotifyKeys);
   // Same search terms like from twitter code, for use with: spotify-this-song '<song name here>'
   var searchTrack;
-  if (parameter === undefined) {
+  if (!parameter) {
     searchTrack = "All The Small Things";
   } else {
     searchTrack = parameter;
@@ -108,7 +100,7 @@ function grabSong() {
   // Launching Spotify Search copied from "npmjs node-spotify-api" site
   spotify.search({
     type: 'track',
-    query: searchTrack
+    query: parameter
   }, function(error, data) {
     if (error) {
       console.log('Error occurred: ' + error);
@@ -138,4 +130,3 @@ function grabReadme() {
   });
 }
 switchCase();
-// Was not sure if random.txt contents were supposed to cause spotify-this-song command to trigger, If so sorry :(
