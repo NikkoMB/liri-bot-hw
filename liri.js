@@ -1,12 +1,19 @@
+require("dotenv").config();
 var fs = require("fs");
 var Twitter = require("twitter");
 var Spotify = require("node-spotify-api");
 var request = require("request")
 var keys = require("./keys");
 
+
+
 var action = process.argv[2];
 var parameter = process.argv.slice(3).join(" ");
 // Labelling all my variables and important node stuff
+
+var spotify = new Spotify(keys.spotify);
+var client = new Twitter(keys.twitter);
+
 
 function switchCase() {
   // Switch case statements used from Bank Exercise, uses statements to decalare action
@@ -36,39 +43,34 @@ function switchCase() {
 };
 
 function grabTweets() {
-  console.log("Latest Tweets!");
-  // New variable for Twitter to load keys from keys.js
-  var client = new Twitter (keys.twitterKeys);
+  var params = { screen_name: "RowinnDinosaur" };
+  client.get('statuses/user_timeline', params, function (error, tweets, response) {
+      if (!error) {
+          for (var i = 0; i < tweets.length; i++) {
+              // Setting up the data in a variable so we can append it to te file later
+              var dateCreated = tweets[i].created_at;
+              var tweetText = JSON.stringify(tweets[i].text);
+              var dataDisplayed = dateCreated + "\n" + tweetText + "\n";
+              console.log("\n" + dataDisplayed);
 
-  var params = {
-    screen_name: "RowinnDinosaur"
-  };
-  // Twitter parameters default tweet count of 20, but I only posted 3 tweets
-  client.get("statuses/user_timeline", params, function(error, tweets, response) {
-    // Calling the get method and returning the Data
-    if (!error) {
-      for (var i = 0; i < tweets.length; i++) {
-        var returnedData = ('Number: ' + (i + 1) + '\n' + tweets[i].created_at + '\n' + tweets[i].text + '\n');
-        console.log(returnedData);
+              // Appending the entry to the log.txt file
+          }
       }
-    }
   });
-};
+}
 
 function grabMovie() {
   console.log("My Favorite movie is Starship Troopers!");
 
-  var findMovie;
+  
   // Testing if search term is included with: movie-this '<movie name here>'
-  if (parameter === undefined) {
-    findMovie = "Mr. Nobody";
-  } else {
-    findMovie = parameter;
-  };
+  if (!parameter) {
+    parameter = "Mr. Nobody";
+  } 
 
-  var queryUrl = "http://www.omdbapi.com/?t=" + findMovie + "&y=&plot=short&apikey=40e9cece";
+  var queryUrl = "http://www.omdbapi.com/?t=" + parameter + "&y=&plot=short&apikey=40e9cece";
 
-  console.log(queryUrl);
+  // console.log(queryUrl);
   // Code used from OMDB Exercise done in class then added the extra output information
   request(queryUrl, function(err, res, body) {
 
@@ -89,14 +91,12 @@ function grabMovie() {
 function grabSong() {
   console.log("Music!");
   // Spotify variable loading keys from keys.js
-  var spotify = new Spotify(keys.spotifyKeys);
+ 
   // Same search terms like from twitter code, for use with: spotify-this-song '<song name here>'
-  var searchTrack;
+  
   if (!parameter) {
-    searchTrack = "All The Small Things";
-  } else {
-    searchTrack = parameter;
-  }
+    parameter = "All The Small Things";
+  } 
   // Launching Spotify Search copied from "npmjs node-spotify-api" site
   spotify.search({
     type: 'track',
